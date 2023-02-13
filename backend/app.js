@@ -17,10 +17,16 @@ app.get("/", (req, res) => {
 
 app.get("/api/places", (req, res) => {
   knex
-    .select("*")
+    .select(
+      "places.id",
+      "places.title",
+      knex.raw("count(user_places.user_id) as user_count")
+    )
     .from("places")
-    .then((response) => {
-      return res.status(200).json(response);
+    .leftJoin("user_places", "places.id", "user_places.place_id")
+    .groupBy("places.id", "places.title")
+    .then((rows) => {
+      return res.status(200).json(rows);
     });
 });
 
