@@ -3,14 +3,12 @@
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
-require('dotenv').config()
+require("dotenv").config();
 module.exports = {
-  
-    client: 'pg',
-    connection: process.env.POSTGRES_CONNECTION_URL,
-    pool: {
-      min: 2,
-      max: 10
-    },
-  
+  client: "pg",
+  connection: process.env.POSTGRES_CONNECTION_URL,
+  pool: {
+    min: 2,
+    max: 10,
+  },
 };

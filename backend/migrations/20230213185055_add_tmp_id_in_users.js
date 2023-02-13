@@ -3,10 +3,9 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-  return knex.schema.createTable("users", function (table) {
-    table.increments();
-    table.string("type");
-    table.string("name");
+  return knex.schema.alterTable("users", function (table) {
+    table.dropColumn("type");
+    table.string("tmp_id");
   });
 };
 

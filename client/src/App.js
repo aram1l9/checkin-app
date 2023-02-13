@@ -1,40 +1,37 @@
-import React, {useEffect, useState} from 'react'
-import {getPlaces, setCheckin} from './api/guestApi'
+import React, { useEffect, useState } from "react";
+import { getPlaces, setCheckin } from "./api/guestApi";
+import Place from "./components/place";
 import { v4 as uuidv4 } from 'uuid';
 
 function App() {
-  const [places,setPlaces] = useState([])
+  const [places, setPlaces] = useState([]);
   useEffect(() => {
-    async function fechPlaces(){
-      const {data} = await getPlaces()
-      setPlaces(data)
+    async function fechPlaces() {
+      const { data } = await getPlaces();
+      setPlaces(data);
     }
 
-    fechPlaces()
-  
-    localStorage.setItem('guestId', uuidv4())
+    fechPlaces();
 
-    return () => {
-      localStorage.setItem('guestId', null)
+    if (!localStorage.getItem("guestId")) {
+      localStorage.setItem("guestId", uuidv4());
     }
-  }, [])
+  }, []);
 
+  const handleCheckin = async (id, cb) => {
+    const { data } = await setCheckin({
+      placeId: id,
+      userId: localStorage.getItem("guestId"),
+    });
 
-  
-  const handleCheckin = async (id) => {
-    const {data} = await handleCheckin({placeId:id, userId: localStorage.getItem('guestId')})
-    console.log(data, "dataaa")
-  }
+    cb();
+    console.log(data, "dataaa");
+  };
 
   return (
     <div className="App">
-      {places.map(el => {
-        return (
-          <div key={el.id}>
-            <span>{el.title}</span>
-            <button onClick={() => handleCheckin(el.id)}>Check in</button>
-          </div>
-        )
+      {places.map((el) => {
+        return <Place onCheckin={handleCheckin} key={el.id} {...el} />;
       })}
     </div>
   );
