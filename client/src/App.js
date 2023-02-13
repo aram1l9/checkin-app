@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { getPlaces, setCheckin } from "./api/guestApi";
 import Place from "./components/place";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 function App() {
   const [places, setPlaces] = useState([]);
   useEffect(() => {
+    if (!localStorage.getItem("guestId")) {
+      localStorage.setItem("guestId", uuidv4());
+    }
+
     async function fechPlaces() {
-      const { data } = await getPlaces();
+      const { data } = await getPlaces(localStorage.getItem("guestId"));
       setPlaces(data);
     }
 
     fechPlaces();
-
-    if (!localStorage.getItem("guestId")) {
-      localStorage.setItem("guestId", uuidv4());
-    }
   }, []);
 
   const handleCheckin = async (id, cb) => {

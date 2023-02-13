@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 function Place(props) {
-  const { onCheckin, title, id, user_count } = props;
+  const { onCheckin, title, id, user_names } = props;
   const [disabled, setDisabled] = useState(false);
 
   return (
@@ -19,7 +19,9 @@ function Place(props) {
         Check in
       </button>
       <span>
-        {user_count} {user_count.length === 1 ? "user" : "users"} checked in here
+        {user_names ? user_names.length : 0}{" "}
+        {user_names && user_names.length == 1 ? "user" : "users"} checked in
+        here
       </span>
     </div>
   );

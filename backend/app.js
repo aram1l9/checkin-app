@@ -15,19 +15,56 @@ app.get("/", (req, res) => {
   return res.send("Alive");
 });
 
-app.get("/api/places", (req, res) => {
-  knex
-    .select(
-      "places.id",
-      "places.title",
-      knex.raw("count(user_places.user_id) as user_count")
-    )
-    .from("places")
-    .leftJoin("user_places", "places.id", "user_places.place_id")
-    .groupBy("places.id", "places.title")
-    .then((rows) => {
-      return res.status(200).json(rows);
-    });
+app.get("/api/places/:guestId", async (req, res) => {
+  const guestUuid = req.params.guestId;
+
+  let user = await knex("users").where("tmp_id", guestUuid);
+  console.log(user, "user");
+  let userId;
+  if (user.length === 0) {
+    const newUserID = await addNewUser(guestUuid);
+    if (!!newUserID) {
+      userId = newUserID;
+    }
+  } else {
+    userId = user[0].id;
+  }
+  try {
+    const data = await knex("places")
+      .leftJoin("user_places", function () {
+        this.on("places.id", "=", "user_places.place_id").andOn(
+          "user_places.user_id",
+          "=",
+          userId
+        );
+      })
+      .select(
+        "places.id",
+        "places.title",
+        knex.raw(`(SELECT array_to_json(array_agg(row_to_json(t)))
+  FROM (
+    SELECT users.id, users.name
+    FROM users
+    JOIN user_places ON users.id = user_places.user_id
+    WHERE user_places.place_id = places.id
+  ) t
+) AS user_names`)
+      )
+      .select(
+        knex.raw(`
+(CASE 
+  WHEN user_places.id IS NOT NULL THEN 'true'
+  ELSE 'false'
+END) AS isChecked
+`)
+      )
+      .groupBy("places.id", "user_places.user_id", "user_places.id");
+
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err, "err");
+    return res.status(400).json({ error: true, err });
+  }
 });
 
 app.post("/api/places", async (req, res) => {
