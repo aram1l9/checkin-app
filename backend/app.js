@@ -96,11 +96,13 @@ app.post("/api/places", async (req, res) => {
 
     if (isCheckedIn.length === 0) {
       try {
-        await knex("user_places").insert({
-          user_id: userId,
-          place_id: placeId,
-        });
-        return res.status(201).json({ success: true });
+        const data = await knex("user_places")
+          .insert({
+            user_id: userId,
+            place_id: placeId,
+          })
+          .returning("user_id");
+        return res.status(201).json(data);
       } catch (error) {
         return res.status(400).json(error);
       }

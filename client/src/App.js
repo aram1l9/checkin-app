@@ -25,7 +25,25 @@ function App() {
     });
 
     cb();
-    console.log(data, "dataaa");
+
+    const newPlaces = [...places].map((el) => {
+      let newUserObj = {
+        id: data[0].user_id,
+        name: `User ${localStorage.getItem("guestId")}`,
+      };
+      if (el.id === id) {
+        return {
+          ...el,
+          ischecked: "true",
+          user_names: el.user_names
+            ? [...el.user_names, newUserObj]
+            : [newUserObj],
+        };
+      }
+      return el;
+    });
+
+    setPlaces(newPlaces);
   };
 
   return (
