@@ -23,6 +23,32 @@ function Place(props) {
         {user_names && user_names.length == 1 ? "user" : "users"} checked in
         here
       </span>
+      {ischecked === "true" && user_names && user_names.length > 0 && (
+        <div>
+          {user_names
+            .filter(
+              (user) => !user.name.includes(localStorage.getItem("guestId"))
+            )
+            .map((user, idx, arr) => (
+              <span key={user.id}>
+                {user.name}
+                {idx !== arr.length - 1 && ","}
+              </span>
+            ))}
+          {user_names.filter(
+            (user) => !user.name.includes(localStorage.getItem("guestId"))
+          ).length > 0 && (
+            <>
+              {user_names.filter(
+                (user) => !user.name.includes(localStorage.getItem("guestId"))
+              ).length === 1
+                ? " is"
+                : " are"}{" "}
+              also checked in here.
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
